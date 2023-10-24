@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Classifier</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      h1 {
+        margin: 20px 0;
+      }
+      form {
+        width: 100%%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      #image-input {
+        margin: 10px 0;
+      }
+      #predict-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      #predict-button:hover {
+        background-color: #0056b3;
+      }
+      #result {
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      #image-preview {
+        width: 40vw;
+        height: auto;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Classifier</h1>
+    <form id="image-form" enctype="multipart/form-data">
+      <input type="file" name="image" id="image-input" accept="image/*" />
+      <img
+        id="image-preview"
+        src="#"
+        alt="Selected Image"
+        style="display: none"
+      />
+      <button type="button" id="predict-button">Predict</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+      const form = document.getElementById("image-form");
+      const imageInput = document.getElementById("image-input");
+      const predictButton = document.getElementById("predict-button");
+      const resultDiv = document.getElementById("result");
+      const imagePreview = document.getElementById("image-preview");
+
+      imageInput.addEventListener("change", () => {
+        const file = imageInput.files[0];
+        if (file) {
+          imagePreview.style.display = "block";
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            imagePreview.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          imagePreview.style.display = "none";
+        }
+      });
+
+      predictButton.addEventListener("click", () => {
+        const formData = new FormData(form);
+
+        fetch("/", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            resultDiv.innerHTML = `Predicted Class: ${data.predicted_class}`;
+          });
+      });
+    </script>
+  </body>
+</html>
